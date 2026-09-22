@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Beplan jou dag, op jou manier</string>
+    <string name="login_title">Welkom terug</string>
+    <string name="hint_email">E-posadres</string>
+    <string name="hint_password">Wagwoord</string>
+    <string name="hint_confirm_password">Bevestig wagwoord</string>
+    <string name="hint_full_name">Volle naam</string>
+    <string name="btn_login">Meld aan</string>
+    <string name="btn_register">Registreer</string>
+    <string name="btn_google">Gaan voort met Google</string>
+    <string name="or_divider">OF</string>
+    <string name="link_to_register">Het jy nie \'n rekening nie? Registreer hier</string>
+    <string name="link_to_login">Het jy reeds \'n rekening? Meld aan</string>
+    <string name="create_account">Skep rekening</string>
+
+    <string name="err_required">Verpligtend</string>
+    <string name="err_email">Voer \'n geldige e-posadres in</string>
+    <string name="err_password_required">Wagwoord is verpligtend</string>
+    <string name="err_password_rules">Gebruik 8+ karakters met ten minste een letter en een syfer</string>
+    <string name="err_password_match">Wagwoorde stem nie ooreen nie</string>
+    <string name="err_name">Voer jou volle naam in (ten minste 2 karakters)</string>
+    <string name="err_title">Titel is verpligtend</string>
+    <string name="err_generic">Iets het verkeerd geloop. Probeer asseblief weer.</string>
+    <string name="err_no_internet">Geen internetverbinding nie. Probeer asseblief weer wanneer jy aanlyn is.</string>
+    <string name="google_failed">Google-aanmelding het misluk. Probeer asseblief weer.</string>
+    <string name="msg_session_expired">Sessie het verstryk. Meld asseblief weer aan.</string>
+
+    <string name="home_greeting">Hallo %1$s</string>
+    <string name="home_stats">🔥 %1$d-dag reeks • %2$d voltooi hierdie week</string>
+    <string name="offline_banner">Aflyn – veranderinge sal outomaties sinchroniseer</string>
+    <string name="syncing_banner">Sinchroniseer veranderinge…</string>
+    <string name="chip_all">Almal</string>
+    <string name="chip_add_list">+ Lys</string>
+    <string name="empty_tasks">Nog geen take nie. Tik + om een by te voeg.</string>
+    <string name="menu_settings">Instellings</string>
+    <string name="menu_new_list">Nuwe lys</string>
+    <string name="cd_add">Voeg taak by</string>
+
+    <string name="title_new_task">Nuwe taak</string>
+    <string name="title_edit_task">Wysig taak</string>
+    <string name="hint_task_title">Taaktitel</string>
+    <string name="hint_task_desc">Beskrywing (opsioneel)</string>
+    <string name="hint_list">Lys</string>
+    <string name="hint_priority">Prioriteit</string>
+    <string name="hint_due_date">Sperdatum</string>
+    <string name="hint_due_time">Tyd</string>
+    <string name="label_subtasks">Subtake</string>
+    <string name="btn_add_subtask">+ Voeg subtaak by</string>
+    <string name="hint_subtask">Subtaak titel</string>
+    <string name="label_remind">Herinner my</string>
+    <string name="btn_save_task">Stoor taak</string>
+    <string name="btn_clear_date">Vee datum uit</string>
+    <string name="priority_low">Laag</string>
+    <string name="priority_med">Medium</string>
+    <string name="priority_high">Hoog</string>
+
+    <string name="title_task_details">Taakbesonderhede</string>
+    <string name="btn_edit">Wysig</string>
+    <string name="btn_delete">Vee uit</string>
+    <string name="btn_mark_complete">Merk as voltooi</string>
+    <string name="btn_mark_incomplete">Merk as onvoltooid</string>
+    <string name="label_description">Beskrywing</string>
+    <string name="label_subtasks_progress">Subtake (%1$d van %2$d voltooi)</string>
+    <string name="label_no_description">Geen beskrywing nie</string>
+    <string name="label_due">Sperdatum: %1$s</string>
+    <string name="label_list">Lys: %1$s</string>
+    <string name="sync_synced">✓ Gesinchroniseer</string>
+    <string name="sync_pending">⟳ Wag om te sinchroniseer</string>
+    <string name="dialog_delete_task_title">Vee taak uit?</string>
+    <string name="dialog_delete_task_msg">Dit kan nie ongedaan gemaak word nie.</string>
+    <string name="btn_cancel">Kanselleer</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Stoor</string>
+
+    <string name="title_settings">Instellings</string>
+    <string name="setting_name">Naam</string>
+    <string name="setting_language">Taal</string>
+    <string name="setting_notifications">Kennisgewings</string>
+    <string name="setting_dark">Donker tema</string>
+    <string name="setting_password">Verander wagwoord</string>
+    <string name="btn_logout">Meld af</string>
+    <string name="hint_current_password">Huidige wagwoord</string>
+    <string name="hint_new_password">Nuwe wagwoord</string>
+    <string name="msg_password_updated">Wagwoord opgedateer</string>
+    <string name="msg_password_google">Hierdie rekening meld met Google aan en het dus nie \'n wagwoord nie.</string>
+    <string name="msg_saved">Gestoor</string>
+
+    <string name="dialog_new_list">Nuwe lys</string>
+    <string name="dialog_rename_list">Hernoem lys</string>
+    <string name="hint_list_name">Lysnaam</string>
+    <string name="msg_lists_need_internet">Maak verbinding met die internet om lyste te bestuur.</string>
+    <string name="dialog_delete_list_msg">Vee hierdie lys en al sy take uit?</string>
+
+    <string name="reminder_title">Taak is verskuldig</string>
+    <string name="notif_channel">Taakherinnerings</string>
+</resources>

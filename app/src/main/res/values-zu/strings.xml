@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Hlela usuku lwakho, ngendlela yakho</string>
+    <string name="login_title">Siyakwamukela futhi</string>
+    <string name="hint_email">Ikheli le-imeyili</string>
+    <string name="hint_password">Iphasiwedi</string>
+    <string name="hint_confirm_password">Qinisekisa iphasiwedi</string>
+    <string name="hint_full_name">Igama eliphelele</string>
+    <string name="btn_login">Ngena</string>
+    <string name="btn_register">Bhalisa</string>
+    <string name="btn_google">Qhubeka nge-Google</string>
+    <string name="or_divider">NOMA</string>
+    <string name="link_to_register">Awunayo i-akhawunti? Bhalisa lapha</string>
+    <string name="link_to_login">Usunayo i-akhawunti? Ngena</string>
+    <string name="create_account">Vula i-akhawunti</string>
+
+    <string name="err_required">Iyadingeka</string>
+    <string name="err_email">Faka ikheli le-imeyili elivumelekile</string>
+    <string name="err_password_required">Iphasiwedi iyadingeka</string>
+    <string name="err_password_rules">Sebenzisa okungenani izinhlamvu eziyi-8 nohlamvu olulodwa nenombolo eyodwa</string>
+    <string name="err_password_match">Amaphasiwedi awafani</string>
+    <string name="err_name">Faka igama lakho eliphelele (okungenani izinhlamvu ezi-2)</string>
+    <string name="err_title">Isihloko siyadingeka</string>
+    <string name="err_generic">Kukhona okungahambanga kahle. Sicela uzame futhi.</string>
+    <string name="err_no_internet">Alukho uxhumo lwe-inthanethi. Sicela uzame futhi uma usuxhumile.</string>
+    <string name="google_failed">Ukungena nge-Google akuphumelelanga. Sicela uzame futhi.</string>
+    <string name="msg_session_expired">Isikhathi sakho siphelile. Sicela ungene futhi.</string>
+
+    <string name="home_greeting">Sawubona, %1$s</string>
+    <string name="home_stats">🔥 Izinsuku ezilandelanayo: %1$d • %2$d kwenziwe kuleli sonto</string>
+    <string name="offline_banner">Awuxhumile – izinguquko zizohlanganiswa ngokuzenzakalelayo</string>
+    <string name="syncing_banner">Kuhlanganiswa izinguquko…</string>
+    <string name="chip_all">Konke</string>
+    <string name="chip_add_list">+ Uhlu</string>
+    <string name="empty_tasks">Awunazo izinto ozenzayo. Thepha + ukwengeza.</string>
+    <string name="menu_settings">Izilungiselelo</string>
+    <string name="menu_new_list">Uhlu olusha</string>
+    <string name="cd_add">Engeza umsebenzi</string>
+
+    <string name="title_new_task">Umsebenzi omusha</string>
+    <string name="title_edit_task">Hlela umsebenzi</string>
+    <string name="hint_task_title">Isihloko somsebenzi</string>
+    <string name="hint_task_desc">Incazelo (ngokuzithandela)</string>
+    <string name="hint_list">Uhlu</string>
+    <string name="hint_priority">Ukubaluleka</string>
+    <string name="hint_due_date">Usuku lokugcina</string>
+    <string name="hint_due_time">Isikhathi sokugcina</string>
+    <string name="label_subtasks">Imisebenzi engaphansi</string>
+    <string name="btn_add_subtask">+ Engeza umsebenzi ongaphansi</string>
+    <string name="hint_subtask">Isihloko somsebenzi ongaphansi</string>
+    <string name="label_remind">Ngikhumbuze</string>
+    <string name="btn_save_task">Gcina umsebenzi</string>
+    <string name="btn_clear_date">Cisha usuku</string>
+    <string name="priority_low">Okuphansi</string>
+    <string name="priority_med">Okuphakathi</string>
+    <string name="priority_high">Okuphezulu</string>
+
+    <string name="title_task_details">Imininingwane yomsebenzi</string>
+    <string name="btn_edit">Hlela</string>
+    <string name="btn_delete">Susa</string>
+    <string name="btn_mark_complete">Maka njengowenziwe</string>
+    <string name="btn_mark_incomplete">Maka njengongenziwe</string>
+    <string name="label_description">Incazelo</string>
+    <string name="label_subtasks_progress">Imisebenzi engaphansi (%1$d ku-%2$d yenziwe)</string>
+    <string name="label_no_description">Ayikho incazelo</string>
+    <string name="label_due">Usuku lokugcina: %1$s</string>
+    <string name="label_list">Uhlu: %1$s</string>
+    <string name="sync_synced">✓ Kuhlanganisiwe</string>
+    <string name="sync_pending">⟳ Kulindele ukuhlanganiswa</string>
+    <string name="dialog_delete_task_title">Susa umsebenzi?</string>
+    <string name="dialog_delete_task_msg">Lokhu akunakubuyiswa.</string>
+    <string name="btn_cancel">Khansela</string>
+    <string name="btn_ok">Kulungile</string>
+    <string name="btn_save">Gcina</string>
+
+    <string name="title_settings">Izilungiselelo</string>
+    <string name="setting_name">Igama</string>
+    <string name="setting_language">Ulimi</string>
+    <string name="setting_notifications">Izaziso</string>
+    <string name="setting_dark">Itimu emnyama</string>
+    <string name="setting_password">Shintsha iphasiwedi</string>
+    <string name="btn_logout">Phuma</string>
+    <string name="hint_current_password">Iphasiwedi yamanje</string>
+    <string name="hint_new_password">Iphasiwedi entsha</string>
+    <string name="msg_password_updated">Iphasiwedi ivuselelwe</string>
+    <string name="msg_password_google">Le akhawunti ingena nge-Google, ngakho ayinaphasiwedi.</string>
+    <string name="msg_saved">Kugciniwe</string>
+
+    <string name="dialog_new_list">Uhlu olusha</string>
+    <string name="dialog_rename_list">Qamba kabusha uhlu</string>
+    <string name="hint_list_name">Igama loluhlu</string>
+    <string name="msg_lists_need_internet">Xhuma ku-inthanethi ukuze ulawule izinhlu.</string>
+    <string name="dialog_delete_list_msg">Susa lolu hlu nemisebenzi yalo yonke?</string>
+
+    <string name="reminder_title">Umsebenzi ufikile isikhathi</string>
+    <string name="notif_channel">Izikhumbuzo zemisebenzi</string>
+</resources>

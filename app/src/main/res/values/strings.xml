@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">TaskFlow</string>
+    <string name="lang_en" translatable="false">English</string>
+    <string name="lang_zu" translatable="false">isiZulu</string>
+    <string name="lang_af" translatable="false">Afrikaans</string>
+
+    <string name="tagline">Plan your day, your way</string>
+    <string name="login_title">Welcome Back</string>
+    <string name="hint_email">Email address</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm password</string>
+    <string name="hint_full_name">Full name</string>
+    <string name="btn_login">Log In</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_google">Continue with Google</string>
+    <string name="or_divider">OR</string>
+    <string name="link_to_register">Don\'t have an account? Register here</string>
+    <string name="link_to_login">Already have an account? Log in</string>
+    <string name="create_account">Create Account</string>
+
+    <string name="err_required">Required</string>
+    <string name="err_email">Enter a valid email address</string>
+    <string name="err_password_required">Password is required</string>
+    <string name="err_password_rules">Use 8+ characters with at least one letter and one number</string>
+    <string name="err_password_match">Passwords do not match</string>
+    <string name="err_name">Enter your full name (at least 2 characters)</string>
+    <string name="err_title">Title is required</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+    <string name="err_no_internet">No internet connection. Please try again when you are online.</string>
+    <string name="google_failed">Google sign-in failed. Please try again.</string>
+    <string name="msg_session_expired">Session expired. Please log in again.</string>
+
+    <string name="home_greeting">Hi %1$s</string>
+    <string name="home_stats">🔥 %1$d-day streak • %2$d done this week</string>
+    <string name="offline_banner">Offline – changes will sync automatically</string>
+    <string name="syncing_banner">Syncing changes…</string>
+    <string name="chip_all">All</string>
+    <string name="chip_add_list">+ List</string>
+    <string name="empty_tasks">No tasks yet. Tap + to add one.</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_new_list">New list</string>
+    <string name="cd_add">Add task</string>
+
+    <string name="title_new_task">New Task</string>
+    <string name="title_edit_task">Edit Task</string>
+    <string name="hint_task_title">Task title</string>
+    <string name="hint_task_desc">Description (optional)</string>
+    <string name="hint_list">List</string>
+    <string name="hint_priority">Priority</string>
+    <string name="hint_due_date">Due date</string>
+    <string name="hint_due_time">Due time</string>
+    <string name="label_subtasks">Subtasks</string>
+    <string name="btn_add_subtask">+ Add subtask</string>
+    <string name="hint_subtask">Subtask title</string>
+    <string name="label_remind">Remind me</string>
+    <string name="btn_save_task">Save Task</string>
+    <string name="btn_clear_date">Clear date</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_med">Medium</string>
+    <string name="priority_high">High</string>
+
+    <string name="title_task_details">Task Details</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_mark_complete">Mark as Complete</string>
+    <string name="btn_mark_incomplete">Mark as Incomplete</string>
+    <string name="label_description">Description</string>
+    <string name="label_subtasks_progress">Subtasks (%1$d of %2$d complete)</string>
+    <string name="label_no_description">No description</string>
+    <string name="label_due">Due: %1$s</string>
+    <string name="label_list">List: %1$s</string>
+    <string name="sync_synced">✓ Synced</string>
+    <string name="sync_pending">⟳ Waiting to sync</string>
+    <string name="dialog_delete_task_title">Delete task?</string>
+    <string name="dialog_delete_task_msg">This cannot be undone.</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Save</string>
+
+    <string name="title_settings">Settings</string>
+    <string name="setting_name">Name</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_notifications">Notifications</string>
+    <string name="setting_dark">Dark theme</string>
+    <string name="setting_password">Change password</string>
+    <string name="btn_logout">Log Out</string>
+    <string name="hint_current_password">Current password</string>
+    <string name="hint_new_password">New password</string>
+    <string name="msg_password_updated">Password updated</string>
+    <string name="msg_password_google">This account signs in with Google, so it has no password.</string>
+    <string name="msg_saved">Saved</string>
+
+    <string name="dialog_new_list">New list</string>
+    <string name="dialog_rename_list">Rename list</string>
+    <string name="hint_list_name">List name</string>
+    <string name="msg_lists_need_internet">Connect to the internet to manage lists.</string>
+    <string name="dialog_delete_list_msg">Delete this list and all its tasks?</string>
+
+    <string name="reminder_title">Task due</string>
+    <string name="notif_channel">Task reminders</string>
+</resources>
