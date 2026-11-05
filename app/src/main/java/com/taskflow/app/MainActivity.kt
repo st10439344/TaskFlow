@@ -5,10 +5,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
@@ -20,28 +22,45 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.taskflow.app.data.local.ListEntity
 import com.taskflow.app.data.remote.ApiResult
 import com.taskflow.app.databinding.ActivityMainBinding
+import com.taskflow.app.push.PushManager
+import com.taskflow.app.util.AppLog
+import com.taskflow.app.util.SmartFilter
+import com.taskflow.app.util.SortOrder
+import com.taskflow.app.util.TaskFilter
 import com.taskflow.app.work.SyncWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-/** Home / task list screen. */
+/**
+ * Home / task list screen.
+ * Tasks come from Room (offline-first). The list chips, smart-filter chips, search box and sort order are
+ * combined into one flow, so the screen updates instantly whenever any of them (or the data) changes.
+ */
 class MainActivity : AppCompatActivity() {
     private lateinit var b: ActivityMainBinding
     private val app get() = application as TaskFlowApp
-    private val selectedList = MutableStateFlow<String?>(null) // null = All
+
+    private val selectedList = MutableStateFlow<String?>(null) // null = all lists
+    private val smartFilter = MutableStateFlow(SmartFilter.ALL)
+    private val query = MutableStateFlow("")
+    private val sortOrder = MutableStateFlow(SortOrder.DUE)
     private var lists: List<ListEntity> = emptyList()
 
     private lateinit var adapter: TaskAdapter
 
     private val notificationPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* reminders simply won't show if denied */ }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            AppLog.i(TAG, "Notification permission granted = $granted")
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!app.session.isLoggedIn) { goToLogin(); return }
+        useEdgeToEdge()
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
+        applyInsets(b.root, header = b.toolbar, bottomView = b.rvTasks, fab = b.fabAdd)
 
         restoreLanguageIfNeeded()
         askNotificationPermission()
@@ -51,9 +70,12 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.action_settings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.action_new_list -> promptNewList()
+                R.id.action_sort -> showSortDialog()
             }
             true
         }
+        setupSearch()
+        setupFilterChips()
 
         adapter = TaskAdapter(
             onClick = { startActivity(Intent(this, TaskDetailActivity::class.java).putExtra(TaskDetailActivity.EXTRA_TASK_ID, it.localId)) },
@@ -74,8 +96,66 @@ class MainActivity : AppCompatActivity() {
         if (!::b.isInitialized) return
         b.toolbar.subtitle = getString(R.string.home_greeting, app.session.fullName)
         b.toolbar.setSubtitleTextColor(getColor(R.color.white))
-        SyncWorker.enqueue(this) // refresh whenever the screen comes back
+        SyncWorker.enqueue(this)          // refresh whenever the screen comes back
+        PushManager.registerDevice(app)   // make sure this phone is registered for push notifications
     }
+
+    // ---------- search, smart filters and sorting ----------
+
+    private fun setupSearch() {
+        val item = b.toolbar.menu.findItem(R.id.action_search)
+        val searchView = item.actionView as SearchView
+        searchView.queryHint = getString(R.string.search_hint)
+        searchView.maxWidth = Int.MAX_VALUE
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(q: String?) = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                query.value = newText.orEmpty()
+                return true
+            }
+        })
+        item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(i: MenuItem) = true
+            override fun onMenuItemActionCollapse(i: MenuItem): Boolean {
+                query.value = ""
+                return true
+            }
+        })
+    }
+
+    private fun setupFilterChips() {
+        val entries = listOf(
+            SmartFilter.ALL to R.string.chip_all,
+            SmartFilter.TODAY to R.string.filter_today,
+            SmartFilter.OVERDUE to R.string.filter_overdue,
+            SmartFilter.UPCOMING to R.string.filter_upcoming,
+            SmartFilter.DONE to R.string.filter_done
+        )
+        b.chipGroupFilter.removeAllViews()
+        for ((filter, label) in entries) {
+            val chip = layoutInflater.inflate(R.layout.chip_filter, b.chipGroupFilter, false) as Chip
+            chip.text = getString(label)
+            chip.id = View.generateViewId()
+            chip.isChecked = filter == smartFilter.value
+            chip.setOnClickListener { smartFilter.value = filter }
+            b.chipGroupFilter.addView(chip)
+        }
+    }
+
+    private fun showSortDialog() {
+        val orders = SortOrder.values()
+        val labels = listOf(R.string.sort_due, R.string.sort_priority, R.string.sort_recent, R.string.sort_title)
+            .map { getString(it) }.toTypedArray()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.action_sort)
+            .setSingleChoiceItems(labels, orders.indexOf(sortOrder.value)) { dialog, which ->
+                sortOrder.value = orders[which]
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // ---------- data ----------
 
     private fun observe() {
         lifecycleScope.launch {
@@ -84,11 +164,13 @@ class MainActivity : AppCompatActivity() {
                     app.taskRepo.observeLists().collect { lists = it; rebuildChips() }
                 }
                 launch {
-                    combine(app.taskRepo.observeTasks(), selectedList) { tasks, sel ->
-                        if (sel == null) tasks else tasks.filter { it.listId == sel }
-                    }.collect {
-                        adapter.submitList(it)
-                        b.tvEmpty.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+                    combine(app.taskRepo.observeTasks(), selectedList, smartFilter, query, sortOrder) { tasks, list, filter, q, sort ->
+                        TaskFilter.apply(tasks, list, filter, q, sort)
+                    }.collect { shown ->
+                        adapter.submitList(shown)
+                        val filtering = selectedList.value != null || smartFilter.value != SmartFilter.ALL || query.value.isNotBlank()
+                        b.tvEmpty.setText(if (filtering) R.string.empty_filtered else R.string.empty_tasks)
+                        b.tvEmpty.visibility = if (shown.isEmpty()) View.VISIBLE else View.GONE
                     }
                 }
                 launch {
@@ -102,7 +184,10 @@ class MainActivity : AppCompatActivity() {
                         }
                 }
                 launch {
-                    app.network.online.collect { if (it) SyncWorker.enqueue(this@MainActivity) } // sync on reconnect
+                    app.network.online.collect {
+                        AppLog.i(TAG, "Network online = $it")
+                        if (it) SyncWorker.enqueue(this@MainActivity) // sync on reconnect
+                    }
                 }
                 launch {
                     app.session.stats.collect { b.tvStats.text = getString(R.string.home_stats, it.streak, it.weekly) }
@@ -155,7 +240,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (val r = app.taskRepo.createList(name)) {
                     is ApiResult.Success -> done(null)
-                    is ApiResult.Error -> done(if (r.isNetwork) getString(R.string.err_no_internet) else r.message)
+                    is ApiResult.Error -> done(r.localizedMessage(this@MainActivity))
                 }
             }
         }
@@ -167,7 +252,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (val r = app.taskRepo.renameList(list.id, name)) {
                     is ApiResult.Success -> done(null)
-                    is ApiResult.Error -> done(if (r.isNetwork) getString(R.string.err_no_internet) else r.message)
+                    is ApiResult.Error -> done(r.localizedMessage(this@MainActivity))
                 }
             }
         }
@@ -182,7 +267,7 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     when (val r = app.taskRepo.deleteList(list.id)) {
                         is ApiResult.Success -> { if (selectedList.value == list.id) selectedList.value = null }
-                        is ApiResult.Error -> toast(if (r.isNetwork) getString(R.string.err_no_internet) else r.message)
+                        is ApiResult.Error -> toast(r.localizedMessage(this@MainActivity))
                     }
                 }
             }
@@ -194,6 +279,7 @@ class MainActivity : AppCompatActivity() {
         val saved = app.session.language
         val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
         if (saved != "en" && current.isEmpty()) {
+            AppLog.i(TAG, "Restoring saved language: $saved")
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(saved))
         }
     }
@@ -202,5 +288,9 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private companion object {
+        const val TAG = "Main"
     }
 }

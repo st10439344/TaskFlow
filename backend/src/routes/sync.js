@@ -5,6 +5,7 @@ const Task = require('../models/Task');
 const TaskList = require('../models/TaskList');
 const { parseTaskFields } = require('../utils/validators');
 const { applyCompletion, currentStats } = require('../utils/streak');
+const push = require('../services/push');
 
 const router = express.Router();
 router.use(auth);
@@ -26,6 +27,8 @@ router.post('/', async (req, res, next) => {
     const ownedLists = new Set((await TaskList.find({ userId: req.user._id }, '_id')).map((l) => l._id.toString()));
     const results = [];
     let streakTouched = false;
+    const streakBefore = req.user.streakCount;
+    const deviceToken = req.get('X-Device-Token') || null;
 
     for (const c of changes) {
       if (!c || typeof c.clientId !== 'string' || !c.clientId) {
@@ -82,6 +85,12 @@ router.post('/', async (req, res, next) => {
     }
 
     if (streakTouched) await req.user.save();
+
+    // Real-time updates: tell the user's other devices to sync, and send any achievement alerts.
+    if (results.some((r) => ['created', 'updated', 'deleted'].includes(r.status))) push.notifySync(req.user, deviceToken);
+    if (streakTouched) push.afterCompletion(req.user, streakBefore);
+
+    console.log(`[sync] ${changes.length} change(s): ${results.map((r) => r.status).join(',')}`);
     res.json({ results, stats: currentStats(req.user) });
   } catch (err) {
     next(err);

@@ -3,11 +3,21 @@ package com.taskflow.app
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.text.InputType
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.appcompat.app.AlertDialog
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -18,9 +28,70 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.taskflow.app.data.local.TaskEntity
+import com.taskflow.app.data.remote.ApiResult
 
 fun Context.toast(@StringRes res: Int) = Toast.makeText(this, res, Toast.LENGTH_LONG).show()
 fun Context.toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
+
+// ---------------------------------------------------------------------------------------------
+// Edge-to-edge (required once an app targets Android 15+/API 36: Android Developers, n.d.)
+// ---------------------------------------------------------------------------------------------
+
+/** Draws behind the system bars with light status-bar icons (every screen has a dark blue header). Call before setContentView. */
+fun AppCompatActivity.useEdgeToEdge() {
+    enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
+}
+
+/**
+ * Keeps the coloured [header] behind the status bar (it grows by the bar's height) and lifts [bottomView]
+ * (and the optional [fab]) above the navigation bar and the on-screen keyboard.
+ */
+fun AppCompatActivity.applyInsets(root: View, header: View? = null, bottomView: View? = null, fab: View? = null) {
+    val headerPadTop = header?.paddingTop ?: 0
+    val headerHeight = header?.layoutParams?.height ?: 0
+    val bottomPad = bottomView?.paddingBottom ?: 0
+    val fabMargin = (fab?.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
+
+    ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+        val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+        root.updatePadding(left = bars.left, right = bars.right)
+        header?.let { h ->
+            h.updatePadding(top = headerPadTop + bars.top)
+            if (headerHeight > 0) h.updateLayoutParams { height = headerHeight + bars.top }
+        }
+        bottomView?.updatePadding(bottom = bottomPad + maxOf(bars.bottom, ime.bottom))
+        fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = fabMargin + bars.bottom }
+        insets
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Messages shown to the user are localised here, instead of showing the API's English text.
+// ---------------------------------------------------------------------------------------------
+
+enum class ErrorContext { GENERAL, LOGIN, PASSWORD }
+
+fun ApiResult.Error.localizedMessage(context: Context, where: ErrorContext = ErrorContext.GENERAL): String = when {
+    isNetwork -> context.getString(R.string.err_no_internet)
+    code == 401 && where == ErrorContext.LOGIN -> context.getString(R.string.err_invalid_credentials)
+    code == 401 && where == ErrorContext.PASSWORD -> context.getString(R.string.err_wrong_password)
+    code == 409 -> context.getString(R.string.err_email_taken)
+    code == 429 -> context.getString(R.string.err_too_many)
+    code >= 500 -> context.getString(R.string.err_server)
+    message.isNotBlank() -> message
+    else -> context.getString(R.string.err_generic)
+}
+
+fun repeatLabel(context: Context, rule: String): String = context.getString(
+    when (rule) {
+        "daily" -> R.string.repeat_daily
+        "weekly" -> R.string.repeat_weekly
+        "monthly" -> R.string.repeat_monthly
+        else -> R.string.repeat_none
+    }
+)
 
 fun Activity.goToLogin() {
     startActivity(Intent(this, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))

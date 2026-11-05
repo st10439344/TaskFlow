@@ -22,8 +22,10 @@ class TaskDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        useEdgeToEdge()
         b = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(b.root)
+        applyInsets(b.root, header = b.toolbar, bottomView = b.scroll)
         b.toolbar.setNavigationOnClickListener { finish() }
 
         val id = intent.getStringExtra(EXTRA_TASK_ID)
@@ -53,6 +55,8 @@ class TaskDetailActivity : AppCompatActivity() {
         b.tvTitle.text = t.title
         b.tvList.text = getString(R.string.label_list, listNames[t.listId] ?: "-")
         b.tvDue.text = getString(R.string.label_due, listOfNotNull(t.dueDate, t.dueTime).joinToString(" ").ifEmpty { "-" })
+        b.tvRepeat.visibility = if (t.repeatRule == "none") android.view.View.GONE else android.view.View.VISIBLE
+        b.tvRepeat.text = getString(R.string.label_repeat, repeatLabel(this, t.repeatRule))
         b.tvPriority.text = priorityLabel(this, t.priority)
         b.tvPriority.setTextColor(priorityColor(this, t.priority))
         b.tvSync.text = syncLabel(this, t)

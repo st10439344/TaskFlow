@@ -11,12 +11,22 @@ import com.taskflow.app.data.remote.ApiService
 import com.taskflow.app.data.remote.ListRequest
 import com.taskflow.app.data.remote.SyncRequest
 import com.taskflow.app.data.remote.SyncResponse
+import com.taskflow.app.data.remote.TaskDto
 import com.taskflow.app.data.remote.safeCall
+import com.taskflow.app.util.AppLog
+import com.taskflow.app.util.Recurrence
 import com.taskflow.app.work.ReminderScheduler
 import com.taskflow.app.work.SyncWorker
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.UUID
 
+/**
+ * Repository pattern: the UI only talks to this class, never to Room or Retrofit directly.
+ * Offline-first: every task change is written to Room first and marked "pending"; WorkManager
+ * ([SyncWorker]) pushes pending changes to the API as soon as there is a connection.
+ * (Android Developers, n.d. "Build an offline-first app")
+ */
 class TaskRepository(
     private val ctx: Context,
     private val db: AppDatabase,
@@ -25,7 +35,7 @@ class TaskRepository(
 ) {
     private val taskDao = db.taskDao()
     private val listDao = db.listDao()
-    private val mutex = Mutex()
+    private val mutex = Mutex() // only one sync at a time
 
     fun observeTasks() = taskDao.observeAll()
     fun observeTask(id: String) = taskDao.observe(id)
@@ -40,17 +50,41 @@ class TaskRepository(
     suspend fun saveTask(task: TaskEntity) {
         val t = task.copy(updatedAt = System.currentTimeMillis(), syncStatus = SYNC_PENDING, deleted = false)
         taskDao.upsert(t)
+        AppLog.d(TAG, "Task saved locally (pending sync), repeat=${t.repeatRule}, remind=${t.remind}")
         ReminderScheduler.schedule(ctx, t, session.notifications)
         SyncWorker.enqueue(ctx)
     }
 
     suspend fun setComplete(task: TaskEntity, done: Boolean) {
-        if (task.isComplete != done) saveTask(task.copy(isComplete = done))
+        if (task.isComplete == done) return
+        saveTask(task.copy(isComplete = done))
+        if (done) spawnNextOccurrence(task)
+    }
+
+    /** Repeating tasks: completing one creates the next occurrence (also works offline, it syncs like any task). */
+    private suspend fun spawnNextOccurrence(task: TaskEntity) {
+        val due = task.dueDate ?: return
+        val next = Recurrence.nextDueDate(due, task.repeatRule) ?: return
+        if (taskDao.countOpenDuplicates(task.listId, task.title, next) > 0) {
+            AppLog.d(TAG, "Next occurrence already exists, not creating a duplicate")
+            return
+        }
+        val freshSubtasks = SubtaskCodec.fromJson(task.subtasksJson).map { it.copy(isComplete = false) }
+        val nextTask = task.copy(
+            localId = UUID.randomUUID().toString(),
+            serverId = null,
+            dueDate = next,
+            isComplete = false,
+            subtasksJson = SubtaskCodec.toJson(freshSubtasks)
+        )
+        AppLog.i(TAG, "Created next ${task.repeatRule} occurrence due $next")
+        saveTask(nextTask)
     }
 
     suspend fun deleteTask(task: TaskEntity) {
         taskDao.upsert(task.copy(deleted = true, syncStatus = SYNC_PENDING, updatedAt = System.currentTimeMillis()))
         ReminderScheduler.cancel(ctx, task.localId)
+        AppLog.d(TAG, "Task marked deleted locally (pending sync)")
         SyncWorker.enqueue(ctx)
     }
 
@@ -81,19 +115,23 @@ class TaskRepository(
         if (!session.isLoggedIn) return@withLock true
 
         val pending = taskDao.getPending()
+        AppLog.i(TAG, "Sync started: ${pending.size} pending change(s)")
         if (pending.isNotEmpty()) {
             when (val r = safeCall { api.sync(SyncRequest(pending.map { it.toChange() })) }) {
                 is ApiResult.Success -> {
                     applyResults(pending, r.data)
                     r.data.stats?.let { session.saveStats(it.streakCount, it.weeklyCompletedCount) }
                 }
-                is ApiResult.Error -> return@withLock r.code == 401
+                is ApiResult.Error -> {
+                    AppLog.w(TAG, "Push of pending changes failed (code ${r.code}), will retry")
+                    return@withLock r.code == 401
+                }
             }
         }
 
         when (val r = safeCall { api.getLists() }) {
             is ApiResult.Success -> listDao.replaceAll(r.data.lists.map { it.toEntity() })
-            is ApiResult.Error -> return@withLock r.code == 401
+            is ApiResult.Error -> { AppLog.w(TAG, "Could not load lists (code ${r.code})"); return@withLock r.code == 401 }
         }
 
         when (val r = safeCall { api.getTasks() }) {
@@ -101,8 +139,9 @@ class TaskRepository(
                 mergeServerTasks(r.data.tasks)
                 r.data.stats?.let { session.saveStats(it.streakCount, it.weeklyCompletedCount) }
             }
-            is ApiResult.Error -> return@withLock r.code == 401
+            is ApiResult.Error -> { AppLog.w(TAG, "Could not load tasks (code ${r.code})"); return@withLock r.code == 401 }
         }
+        AppLog.i(TAG, "Sync finished")
         true
     }
 
@@ -117,14 +156,16 @@ class TaskRepository(
                 is SyncAction.KeepPending ->
                     current?.let { taskDao.upsert(it.copy(serverId = action.serverId ?: it.serverId)) }
                 SyncAction.HardDelete -> taskDao.hardDelete(sent.localId)
-                is SyncAction.ReplaceWithServer ->
+                is SyncAction.ReplaceWithServer -> {
+                    AppLog.w(TAG, "Conflict: server copy was newer, keeping the server version")
                     taskDao.upsert(action.task.toEntity(sent.localId, current?.remind ?: false))
+                }
                 SyncAction.None -> Unit
             }
         }
     }
 
-    private suspend fun mergeServerTasks(serverTasks: List<com.taskflow.app.data.remote.TaskDto>) {
+    private suspend fun mergeServerTasks(serverTasks: List<TaskDto>) {
         val local = taskDao.getAll()
         val byLocalId = local.associateBy { it.localId }
         val byServerId = local.filter { it.serverId != null }.associateBy { it.serverId }
@@ -138,8 +179,12 @@ class TaskRepository(
         }
         taskDao.upsertAll(toUpsert)
 
-        // Tasks that were synced before but no longer exist on the server were deleted elsewhere.
+        // Tasks that were synced before but no longer exist on the server were deleted on another device.
         local.filter { it.syncStatus == SYNC_SYNCED && it.serverId != null && it.serverId !in serverIds }
             .forEach { taskDao.hardDelete(it.localId) }
+    }
+
+    private companion object {
+        const val TAG = "TaskRepo"
     }
 }

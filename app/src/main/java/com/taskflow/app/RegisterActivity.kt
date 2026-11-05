@@ -12,8 +12,10 @@ class RegisterActivity : AuthBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        useEdgeToEdge()
         b = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(b.root)
+        applyInsets(b.root, header = b.toolbar, bottomView = b.scroll)
 
         b.toolbar.setNavigationOnClickListener { finish() }
         b.btnRegister.setOnClickListener { register() }
@@ -48,7 +50,7 @@ class RegisterActivity : AuthBaseActivity() {
         error.fieldErrors["email"]?.let { b.tilEmail.error = it }
         error.fieldErrors["password"]?.let { b.tilPassword.error = it }
         if (error.fieldErrors.isEmpty()) {
-            if (error.code == 409) b.tilEmail.error = error.message
+            if (error.code == 409) b.tilEmail.error = error.localizedMessage(this)
             super.showError(error)
         }
     }

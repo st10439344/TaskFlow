@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const auth = require('../middleware/auth');
 const { isValidPassword } = require('../utils/validators');
 const { currentStats } = require('../utils/streak');
+const Task = require('../models/Task');
+const TaskList = require('../models/TaskList');
 
 const router = express.Router();
 router.use(auth);
@@ -64,6 +66,20 @@ router.put('/me/password', async (req, res, next) => {
     u.passwordHash = await bcrypt.hash(newPassword, 12);
     await u.save();
     res.json({ message: 'Password updated' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/users/me   - permanently deletes the account and all of its data (Google Play account-deletion policy)
+router.delete('/me', async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const tasks = await Task.deleteMany({ userId });
+    const lists = await TaskList.deleteMany({ userId });
+    await req.user.deleteOne();
+    console.log(`[users] account deleted (${tasks.deletedCount} tasks, ${lists.deletedCount} lists)`);
+    res.json({ message: 'Account deleted' });
   } catch (err) {
     next(err);
   }

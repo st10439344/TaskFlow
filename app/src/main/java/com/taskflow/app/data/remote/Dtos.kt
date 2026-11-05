@@ -72,3 +72,6 @@ data class SyncResultDto(
 )
 
 data class SyncResponse(val results: List<SyncResultDto>, val stats: StatsDto?)
+
+data class DeviceTokenRequest(val fcmToken: String)
+data class TestPushResponse(val message: String?, val sent: Int?, val failed: Int?)

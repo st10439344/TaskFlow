@@ -94,4 +94,45 @@
 
     <string name="reminder_title">Taak is verskuldig</string>
     <string name="notif_channel">Taakherinnerings</string>
+
+    <!-- PoE additions: push notifications, repeating tasks, search/filter/sort, localised errors -->
+    <string name="push_streak_title">🔥 Reeks-mylpaal!</string>
+    <string name="push_streak_body">Jy is op \'n %1$d-dag reeks. Hou aan so!</string>
+    <string name="push_all_done_title">🎉 Alles klaar!</string>
+    <string name="push_all_done_body">Jy het elke taak voltooi. Puik werk!</string>
+    <string name="push_test_title">TaskFlow-toetskennisgewing</string>
+    <string name="push_test_body">Kennisgewings werk op hierdie toestel.</string>
+    <string name="notif_channel_alerts">TaskFlow-waarskuwings</string>
+    <string name="setting_test_push">Stuur toetskennisgewing</string>
+    <string name="push_test_sent">Toetskennisgewing gestuur. Dit behoort binne \'n paar sekondes aan te kom.</string>
+    <string name="push_not_configured">Kennisgewings is nog nie op die bediener opgestel nie.</string>
+    <string name="push_no_device">Hierdie toestel is nog nie vir kennisgewings geregistreer nie. Probeer asseblief weer oor \'n oomblik.</string>
+    <string name="hint_repeat">Herhaal</string>
+    <string name="repeat_none">Herhaal nie</string>
+    <string name="repeat_daily">Daagliks</string>
+    <string name="repeat_weekly">Weekliks</string>
+    <string name="repeat_monthly">Maandeliks</string>
+    <string name="label_repeat">Herhaal: %1$s</string>
+    <string name="err_repeat_needs_date">Kies \'n sperdatum vir \'n herhalende taak</string>
+    <string name="action_search">Soek</string>
+    <string name="action_sort">Sorteer volgens</string>
+    <string name="search_hint">Soek take</string>
+    <string name="filter_today">Vandag</string>
+    <string name="filter_overdue">Agterstallig</string>
+    <string name="filter_upcoming">Komende</string>
+    <string name="filter_done">Voltooi</string>
+    <string name="sort_due">Sperdatum</string>
+    <string name="sort_priority">Prioriteit</string>
+    <string name="sort_recent">Onlangs opgedateer</string>
+    <string name="sort_title">Titel (A–Z)</string>
+    <string name="empty_filtered">Geen take stem met jou filters ooreen nie.</string>
+    <string name="err_invalid_credentials">Ongeldige e-pos of wagwoord</string>
+    <string name="err_email_taken">\'n Rekening met hierdie e-pos bestaan reeds</string>
+    <string name="err_too_many">Te veel pogings. Probeer asseblief later weer.</string>
+    <string name="err_server">Die bediener ondervind probleme. Probeer asseblief binnekort weer.</string>
+    <string name="err_wrong_password">Huidige wagwoord is verkeerd</string>
+    <string name="setting_delete_account">Vee rekening uit</string>
+    <string name="dialog_delete_account_title">Vee jou rekening uit?</string>
+    <string name="dialog_delete_account_msg">Dit vee jou rekening, lyste en take permanent van hierdie toestel en van ons bediener uit. Dit kan nie ongedaan gemaak word nie.</string>
+    <string name="msg_account_deleted">Jou rekening is uitgevee.</string>
 </resources>

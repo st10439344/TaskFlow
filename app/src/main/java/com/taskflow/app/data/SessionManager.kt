@@ -46,6 +46,16 @@ class SessionManager(context: Context) {
         get() = prefs.getBoolean("notifications", true)
         set(v) = prefs.edit().putBoolean("notifications", v).apply()
 
+    /** This phone's Firebase Cloud Messaging token (identifies the device; sent to the API). */
+    var fcmToken: String?
+        get() = prefs.getString("fcmToken", null)
+        set(v) = prefs.edit().putString("fcmToken", v).apply()
+
+    /** The token the API already knows about for the logged-in user (avoids re-sending it on every launch). */
+    var fcmTokenSynced: String?
+        get() = prefs.getString("fcmTokenSynced", null)
+        set(v) = prefs.edit().putString("fcmTokenSynced", v).apply()
+
     /** True when a settings change has not yet reached the server (retried by the sync worker). */
     var settingsDirty: Boolean
         get() = prefs.getBoolean("settingsDirty", false)
@@ -73,7 +83,7 @@ class SessionManager(context: Context) {
     fun clearUser() {
         prefs.edit()
             .remove("token").remove("fullName").remove("email").remove("authProvider")
-            .remove("settingsDirty").remove("streak").remove("weekly")
+            .remove("settingsDirty").remove("streak").remove("weekly").remove("fcmTokenSynced")
             .apply()
         stats.value = Stats(0, 0)
     }

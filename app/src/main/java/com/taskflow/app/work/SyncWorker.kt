@@ -10,15 +10,21 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.taskflow.app.TaskFlowApp
+import com.taskflow.app.util.AppLog
 import java.util.concurrent.TimeUnit
 
-/** Runs as soon as the device has a connection: pushes queued offline changes, then pulls the server state. */
+/**
+ * Runs as soon as the device has a connection: pushes queued offline changes, then pulls the server state.
+ * WorkManager guarantees the work runs even if the app is closed (Android Developers, n.d. "Schedule tasks with WorkManager").
+ */
 class SyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
         val app = applicationContext as TaskFlowApp
         app.userRepo.pushSettingsIfDirty()
-        return if (app.taskRepo.sync()) Result.success() else Result.retry()
+        val done = app.taskRepo.sync()
+        AppLog.d("SyncWorker", if (done) "Work finished" else "Work will be retried with backoff")
+        return if (done) Result.success() else Result.retry()
     }
 
     companion object {

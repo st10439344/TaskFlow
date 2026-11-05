@@ -12,7 +12,9 @@ import com.taskflow.app.data.local.TaskEntity
 import com.taskflow.app.data.repo.SubtaskCodec
 import com.taskflow.app.databinding.ActivityTaskFormBinding
 import com.taskflow.app.databinding.ItemSubtaskFormBinding
+import com.taskflow.app.util.AppLog
 import com.taskflow.app.util.DateUtils
+import com.taskflow.app.util.Recurrence
 import com.taskflow.app.util.Validators
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -28,13 +30,16 @@ class TaskFormActivity : AppCompatActivity() {
     private var existing: TaskEntity? = null
     private var selectedListId: String? = null
     private var priorityIdx = 1
+    private var repeatIdx = 0
     private var date: String? = null
     private var time: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        useEdgeToEdge()
         b = ActivityTaskFormBinding.inflate(layoutInflater)
         setContentView(b.root)
+        applyInsets(b.root, header = b.toolbar, bottomView = b.scroll)
         b.toolbar.setNavigationOnClickListener { finish() }
 
         val editingId = intent.getStringExtra(EXTRA_TASK_ID)
@@ -42,11 +47,11 @@ class TaskFormActivity : AppCompatActivity() {
             lists = app.taskRepo.getLists()
             existing = editingId?.let { app.taskRepo.getTask(it) }
             if (lists.isEmpty()) { toast(R.string.err_generic); finish(); return@launch }
-            setup(true)
+            setup()
         }
     }
 
-    private fun setup(firstTime: Boolean) {
+    private fun setup() {
         val task = existing
         if (task != null) b.toolbar.setTitle(R.string.title_edit_task)
 
@@ -63,14 +68,19 @@ class TaskFormActivity : AppCompatActivity() {
         b.acPriority.setText(labels[priorityIdx], false)
         b.acPriority.setOnItemClickListener { _, _, pos, _ -> priorityIdx = pos }
 
-        if (firstTime) {
-            b.etTitle.setText(task?.title ?: "")
-            b.etDescription.setText(task?.description ?: "")
-            b.switchRemind.isChecked = task?.remind ?: false
-            date = task?.dueDate
-            time = task?.dueTime
-            SubtaskCodec.fromJson(task?.subtasksJson).forEach { addSubtaskRow(it.title, it.isComplete) }
-        }
+        // Repeat dropdown (none / daily / weekly / monthly)
+        val repeatLabels = Recurrence.RULES.map { repeatLabel(this, it) }
+        repeatIdx = Recurrence.RULES.indexOf(task?.repeatRule ?: "none").coerceAtLeast(0)
+        b.acRepeat.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, repeatLabels))
+        b.acRepeat.setText(repeatLabels[repeatIdx], false)
+        b.acRepeat.setOnItemClickListener { _, _, pos, _ -> repeatIdx = pos; b.tilDate.error = null }
+
+        b.etTitle.setText(task?.title ?: "")
+        b.etDescription.setText(task?.description ?: "")
+        b.switchRemind.isChecked = task?.remind ?: false
+        date = task?.dueDate
+        time = task?.dueTime
+        SubtaskCodec.fromJson(task?.subtasksJson).forEach { addSubtaskRow(it.title, it.isComplete) }
         showDateTime()
 
         b.etDate.setOnClickListener { pickDate() }
@@ -89,6 +99,7 @@ class TaskFormActivity : AppCompatActivity() {
         val cal = Calendar.getInstance()
         DatePickerDialog(this, { _, y, m, d ->
             date = DateUtils.formatDate(y, m, d)
+            b.tilDate.error = null
             showDateTime()
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
     }
@@ -118,8 +129,11 @@ class TaskFormActivity : AppCompatActivity() {
 
     private fun save() {
         b.tilTitle.error = null
+        b.tilDate.error = null
         val title = b.etTitle.text.toString().trim()
         if (!Validators.isValidTitle(title)) { b.tilTitle.error = getString(R.string.err_title); return }
+        // A repeating task needs a due date, because the next occurrence is calculated from it.
+        if (repeatIdx != 0 && date == null) { b.tilDate.error = getString(R.string.err_repeat_needs_date); return }
         val listId = selectedListId ?: return
 
         val base = existing ?: TaskEntity(localId = UUID.randomUUID().toString(), listId = listId, title = title)
@@ -130,9 +144,11 @@ class TaskFormActivity : AppCompatActivity() {
             dueDate = date,
             dueTime = if (date == null) null else time,
             priority = priorityCodes[priorityIdx],
+            repeatRule = Recurrence.RULES[repeatIdx],
             remind = b.switchRemind.isChecked,
             subtasksJson = SubtaskCodec.toJson(collectSubtasks())
         )
+        AppLog.d(TAG, "Saving task (edit = ${existing != null})")
         b.btnSave.isEnabled = false
         lifecycleScope.launch {
             app.taskRepo.saveTask(task)
@@ -142,5 +158,6 @@ class TaskFormActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_TASK_ID = "taskId"
+        private const val TAG = "TaskForm"
     }
 }

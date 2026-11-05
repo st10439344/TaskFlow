@@ -10,6 +10,14 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
+// Request log: method, path (no query string, so no tokens), status and duration. Silent while testing.
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'test') return next();
+  const started = Date.now();
+  res.on('finish', () => console.log(`${req.method} ${req.originalUrl.split('?')[0]} ${res.statusCode} ${Date.now() - started}ms`));
+  next();
+});
+
 // Health check (also handy for waking the free Render instance before a demo)
 app.get('/', (_req, res) => res.json({ name: 'TaskFlow API', status: 'ok' }));
 app.get('/health', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));

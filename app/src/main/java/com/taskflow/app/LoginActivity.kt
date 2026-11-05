@@ -12,8 +12,10 @@ class LoginActivity : AuthBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        useEdgeToEdge()
         b = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(b.root)
+        applyInsets(b.root, header = b.tvHeader, bottomView = b.scroll)
 
         b.btnLogin.setOnClickListener { login() }
         b.btnGoogle.setOnClickListener { startGoogleSignIn() }
@@ -36,6 +38,8 @@ class LoginActivity : AuthBaseActivity() {
             handleResult(app.userRepo.login(email, password))
         }
     }
+
+    override val errorContext = ErrorContext.LOGIN
 
     override fun setBusy(busy: Boolean) {
         b.progress.visibility = if (busy) android.view.View.VISIBLE else android.view.View.GONE

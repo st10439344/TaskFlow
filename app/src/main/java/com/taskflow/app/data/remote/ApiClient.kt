@@ -3,6 +3,7 @@ package com.taskflow.app.data.remote
 import com.google.gson.GsonBuilder
 import com.taskflow.app.BuildConfig
 import com.taskflow.app.data.SessionManager
+import com.taskflow.app.util.AppLog
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,10 +17,13 @@ object ApiClient {
             val request = chain.request()
             val builder = request.newBuilder()
             session.token?.let { builder.header("Authorization", "Bearer $it") }
+            // Lets the API skip this phone when it pushes "please sync" messages to the user's other devices.
+            session.fcmToken?.let { builder.header("X-Device-Token", it) }
             val response = chain.proceed(builder.build())
             val path = request.url.encodedPath
             // A 401 on a protected route means the JWT expired. (Auth and password routes use 401 for wrong credentials.)
             if (response.code == 401 && !path.contains("/api/auth/") && !path.endsWith("/password")) {
+                AppLog.w("Api", "401 on a protected route: session expired")
                 session.sessionExpired.tryEmit(Unit)
             }
             response
@@ -27,6 +31,7 @@ object ApiClient {
 
         val logging = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            redactHeader("Authorization")   // never print the JWT in Logcat
         }
 
         // Generous timeouts: the free Render tier can take ~50s to wake up.

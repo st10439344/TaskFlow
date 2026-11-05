@@ -14,7 +14,7 @@ describe('API basics', () => {
     expect(res.status).toBe(404);
   });
   test('protected routes reject requests without a token', async () => {
-    for (const path of ['/api/tasks', '/api/lists', '/api/users/me']) {
+    for (const path of ['/api/tasks', '/api/lists', '/api/users/me', '/api/devices/token']) {
       const res = await request(app).get(path);
       expect(res.status).toBe(401);
     }
@@ -22,6 +22,20 @@ describe('API basics', () => {
   test('protected routes reject a garbage token', async () => {
     const res = await request(app).get('/api/tasks').set('Authorization', 'Bearer not.a.token');
     expect(res.status).toBe(401);
+  });
+});
+
+describe('account deletion', () => {
+  test('DELETE /api/users/me needs a login', async () => {
+    expect((await request(app).delete('/api/users/me')).status).toBe(401);
+  });
+});
+
+describe('device routes', () => {
+  test('registering, removing and testing push all need a login', async () => {
+    expect((await request(app).post('/api/devices/token').send({ fcmToken: 'x'.repeat(30) })).status).toBe(401);
+    expect((await request(app).delete('/api/devices/token').send({ fcmToken: 'x'.repeat(30) })).status).toBe(401);
+    expect((await request(app).post('/api/devices/test')).status).toBe(401);
   });
 });
 

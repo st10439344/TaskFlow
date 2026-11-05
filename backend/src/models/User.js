@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema(
     preferredLanguage: { type: String, enum: ['en', 'zu', 'af'], default: 'en' },
     notificationsEnabled: { type: Boolean, default: true },
     theme: { type: String, enum: ['light', 'dark'], default: 'light' },
-    fcmToken: { type: String, default: null },
+    fcmTokens: { type: [String], default: [] },         // one FCM token per signed-in device (max 5)
+    lastAllDonePush: { type: Date, default: null },     // cooldown for the "all caught up" alert
     streakCount: { type: Number, default: 0 },
     weeklyCompletedCount: { type: Number, default: 0 },
     lastCompletedDay: { type: String, default: null }, // 'YYYY-MM-DD' (SAST)
@@ -28,6 +29,8 @@ userSchema.set('toJSON', {
     delete ret.googleId;
     delete ret.lastCompletedDay;
     delete ret.weekKey;
+    delete ret.fcmTokens;
+    delete ret.lastAllDonePush;
     return ret;
   }
 });

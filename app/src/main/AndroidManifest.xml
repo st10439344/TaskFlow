@@ -24,14 +24,53 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".RegisterActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".TaskFormActivity" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".TaskDetailActivity" android:exported="false" />
-        <activity android:name=".SettingsActivity" android:exported="false" />
 
-        <!-- Lets AppCompat remember the per-app language on Android 12 and below -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".TaskFormActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".TaskDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!-- Firebase Cloud Messaging -->
+        <service
+            android:name=".push.TaskFlowMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="task_alerts" />
+
+        <!-- AppCompat language support -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
@@ -40,5 +79,6 @@
                 android:name="autoStoreLocales"
                 android:value="true" />
         </service>
+
     </application>
 </manifest>

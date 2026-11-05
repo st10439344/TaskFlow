@@ -5,6 +5,7 @@ const Task = require('../models/Task');
 const TaskList = require('../models/TaskList');
 const { parseTaskFields } = require('../utils/validators');
 const { applyCompletion, currentStats } = require('../utils/streak');
+const push = require('../services/push');
 
 const router = express.Router();
 router.use(auth);
@@ -49,6 +50,8 @@ router.post('/', async (req, res, next) => {
     const list = await TaskList.findOne({ _id: req.body.listId, userId: req.user._id });
     if (!list) return res.status(404).json({ message: 'List not found' });
 
+    const streakBefore = req.user.streakCount;
+    const deviceToken = req.get('X-Device-Token') || null;
     const task = new Task({ ...data, listId: list._id, userId: req.user._id });
     if (typeof req.body.clientId === 'string') task.clientId = req.body.clientId;
     if (task.isComplete) {
@@ -57,6 +60,8 @@ router.post('/', async (req, res, next) => {
       await req.user.save();
     }
     await task.save();
+    push.notifySync(req.user, deviceToken);
+    if (task.isComplete) push.afterCompletion(req.user, streakBefore);
     res.status(201).json({ task, stats: currentStats(req.user) });
   } catch (err) {
     if (err.code === 11000) return res.status(409).json({ message: 'Task already exists (duplicate clientId)' });
@@ -82,6 +87,8 @@ router.put('/:id', async (req, res, next) => {
     }
 
     const wasComplete = task.isComplete;
+    const streakBefore = req.user.streakCount;
+    const deviceToken = req.get('X-Device-Token') || null;
     Object.assign(task, data);
     if (data.isComplete !== undefined && data.isComplete !== wasComplete) {
       if (data.isComplete) {
@@ -93,6 +100,8 @@ router.put('/:id', async (req, res, next) => {
       }
     }
     await task.save();
+    push.notifySync(req.user, deviceToken);
+    if (data.isComplete === true && !wasComplete) push.afterCompletion(req.user, streakBefore);
     res.json({ task, stats: currentStats(req.user) });
   } catch (err) {
     next(err);
@@ -105,6 +114,7 @@ router.delete('/:id', async (req, res, next) => {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid task id' });
     const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
     if (!task) return res.status(404).json({ message: 'Task not found' });
+    push.notifySync(req.user, req.get('X-Device-Token') || null);
     res.json({ message: 'Task deleted' });
   } catch (err) {
     next(err);

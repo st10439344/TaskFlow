@@ -1,0 +1,22 @@
+name: Release bundle (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x ./gradlew
+      - name: Build release bundle (unsigned unless signing secrets are added)
+        run: ./gradlew :app:bundleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taskflow-release-bundle
+          path: app/build/outputs/bundle/release/*.aab

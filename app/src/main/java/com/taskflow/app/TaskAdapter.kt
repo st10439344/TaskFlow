@@ -37,6 +37,7 @@ class TaskAdapter(
         val parts = mutableListOf<String>()
         if (t.dueDate != null) parts += listOfNotNull(t.dueDate, t.dueTime).joinToString(" ")
         parts += priorityLabel(ctx, t.priority)
+        if (t.repeatRule != "none") parts += "\uD83D\uDD01 " + repeatLabel(ctx, t.repeatRule)
         val subs = SubtaskCodec.fromJson(t.subtasksJson)
         if (subs.isNotEmpty()) parts += "${subs.count { it.isComplete }}/${subs.size}"
         b.tvMeta.text = parts.joinToString(" • ")

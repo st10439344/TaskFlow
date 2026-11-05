@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.taskflow.app.data.remote.ApiResult
 import com.taskflow.app.data.remote.AuthResponse
+import com.taskflow.app.util.AppLog
 import kotlinx.coroutines.launch
 
 /** Shared behaviour for the Login and Register screens (Google sign-in, error display, navigation). */
@@ -13,6 +14,9 @@ abstract class AuthBaseActivity : AppCompatActivity() {
     protected val app get() = application as TaskFlowApp
 
     protected abstract fun setBusy(busy: Boolean)
+
+    /** Lets each screen say which wording a 401 should get (wrong login vs. expired session). */
+    protected open val errorContext: ErrorContext = ErrorContext.GENERAL
 
     protected fun startGoogleSignIn() {
         lifecycleScope.launch {
@@ -24,6 +28,7 @@ abstract class AuthBaseActivity : AppCompatActivity() {
                 setBusy(false) // user closed the picker
             } catch (e: Exception) {
                 setBusy(false)
+                AppLog.w("Auth", "Google sign-in failed: ${e.javaClass.simpleName}")
                 toast(R.string.google_failed)
             }
         }
@@ -43,7 +48,7 @@ abstract class AuthBaseActivity : AppCompatActivity() {
     }
 
     protected open fun showError(error: ApiResult.Error) {
-        val text = if (error.isNetwork) getString(R.string.err_no_internet) else error.message
+        val text = error.localizedMessage(this, errorContext)
         Snackbar.make(findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG).show()
     }
 }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        useEdgeToEdge()
         setContentView(ActivitySplashBinding.inflate(layoutInflater).root)
         lifecycleScope.launch {
             delay(900)

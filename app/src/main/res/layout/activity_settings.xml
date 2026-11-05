@@ -16,6 +16,7 @@
         app:titleTextColor="@color/white" />
 
     <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -119,6 +120,23 @@
                 android:text="@string/setting_notifications"
                 android:textSize="16sp" />
 
+            <LinearLayout
+                android:id="@+id/rowTestPush"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setting_test_push"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchDark"
                 android:layout_width="match_parent"
@@ -140,6 +158,23 @@
                     android:layout_weight="1"
                     android:text="@string/setting_password"
                     android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rowDeleteAccount"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setting_delete_account"
+                    android:textColor="@color/danger"
                     android:textSize="16sp" />
             </LinearLayout>
 

@@ -94,4 +94,45 @@
 
     <string name="reminder_title">Umsebenzi ufikile isikhathi</string>
     <string name="notif_channel">Izikhumbuzo zemisebenzi</string>
+
+    <!-- PoE additions: push notifications, repeating tasks, search/filter/sort, localised errors -->
+    <string name="push_streak_title">🔥 Impumelelo yezinsuku ezilandelanayo!</string>
+    <string name="push_streak_body">Usunezinsuku ezingu-%1$d zilandelana. Qhubeka kanjalo!</string>
+    <string name="push_all_done_title">🎉 Konke kwenziwe!</string>
+    <string name="push_all_done_body">Uqedile yonke imisebenzi. Umsebenzi omuhle!</string>
+    <string name="push_test_title">Isaziso sokuhlola se-TaskFlow</string>
+    <string name="push_test_body">Izaziso ziyasebenza kule divayisi.</string>
+    <string name="notif_channel_alerts">Izexwayiso ze-TaskFlow</string>
+    <string name="setting_test_push">Thumela isaziso sokuhlola</string>
+    <string name="push_test_sent">Isaziso sokuhlola sithunyelwe. Kufanele sifike ngemizuzwana embalwa.</string>
+    <string name="push_not_configured">Izaziso azikalungiswa kuseva okwamanje.</string>
+    <string name="push_no_device">Le divayisi ayikabhaliswa ukuthola izaziso. Sicela uzame futhi emizuzwini embalwa.</string>
+    <string name="hint_repeat">Ukuphinda</string>
+    <string name="repeat_none">Akuphindwa</string>
+    <string name="repeat_daily">Nsuku zonke</string>
+    <string name="repeat_weekly">Njalo ngesonto</string>
+    <string name="repeat_monthly">Njalo ngenyanga</string>
+    <string name="label_repeat">Iyaphindeka: %1$s</string>
+    <string name="err_repeat_needs_date">Khetha usuku lokugcina lomsebenzi ophindwayo</string>
+    <string name="action_search">Sesha</string>
+    <string name="action_sort">Ukuhlunga</string>
+    <string name="search_hint">Sesha imisebenzi</string>
+    <string name="filter_today">Namuhla</string>
+    <string name="filter_overdue">Edlulile</string>
+    <string name="filter_upcoming">Ezayo</string>
+    <string name="filter_done">Ezenziwe</string>
+    <string name="sort_due">Usuku lokugcina</string>
+    <string name="sort_priority">Ukubaluleka</string>
+    <string name="sort_recent">Ezibuyekezwe muva</string>
+    <string name="sort_title">Isihloko (A–Z)</string>
+    <string name="empty_filtered">Ayikho imisebenzi ehambisana nokuhlungiwe.</string>
+    <string name="err_invalid_credentials">I-imeyili noma iphasiwedi akulungile</string>
+    <string name="err_email_taken">Ikhona i-akhawunti esebenzisa le imeyili</string>
+    <string name="err_too_many">Imizamo eminingi kakhulu. Sicela uzame futhi emuva kwesikhathi.</string>
+    <string name="err_server">Iseva inenkinga. Sicela uzame futhi maduze.</string>
+    <string name="err_wrong_password">Iphasiwedi yamanje ayilungile</string>
+    <string name="setting_delete_account">Susa i-akhawunti</string>
+    <string name="dialog_delete_account_title">Susa i-akhawunti yakho?</string>
+    <string name="dialog_delete_account_msg">Lokhu kuzosusa unomphela i-akhawunti yakho, izinhlu nemisebenzi kule divayisi nakuseva yethu. Lokhu akunakubuyiswa.</string>
+    <string name="msg_account_deleted">I-akhawunti yakho isisusiwe.</string>
 </resources>

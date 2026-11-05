@@ -16,6 +16,7 @@
         app:titleTextColor="@color/white" />
 
     <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -107,7 +108,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:hint="@string/hint_due_date">
+                    android:hint="@string/hint_due_date"
+                    android:id="@+id/tilDate">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDate"
@@ -140,6 +142,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/btn_clear_date" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_repeat">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acRepeat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"

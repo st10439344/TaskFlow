@@ -16,6 +16,13 @@ object DateUtils {
         return f.format(Date(millis))
     }
 
+    /** Today's date as yyyy-MM-dd in the device time zone. */
+    fun todayString(zone: TimeZone = TimeZone.getDefault(), now: Long = System.currentTimeMillis()): String {
+        val f = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        f.timeZone = zone
+        return f.format(Date(now))
+    }
+
     fun formatDate(year: Int, monthZeroBased: Int, day: Int): String =
         String.format(Locale.US, "%04d-%02d-%02d", year, monthZeroBased + 1, day)
 

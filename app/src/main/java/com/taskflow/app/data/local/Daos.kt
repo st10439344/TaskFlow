@@ -63,6 +63,10 @@ interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(tasks: List<TaskEntity>)
 
+    /** Used by recurring tasks so completing, un-completing and re-completing never creates the same next task twice. */
+    @Query("SELECT COUNT(*) FROM tasks WHERE deleted = 0 AND isComplete = 0 AND listId = :listId AND title = :title AND dueDate = :dueDate")
+    suspend fun countOpenDuplicates(listId: String, title: String, dueDate: String): Int
+
     @Query("DELETE FROM tasks WHERE localId = :id")
     suspend fun hardDelete(id: String)
 

@@ -1,11 +1,7 @@
 package com.taskflow.app.work
 
-import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -16,9 +12,13 @@ import com.taskflow.app.R
 import com.taskflow.app.TaskDetailActivity
 import com.taskflow.app.TaskFlowApp
 import com.taskflow.app.data.local.TaskEntity
+import com.taskflow.app.push.NotificationHelper
+import com.taskflow.app.util.AppLog
 import com.taskflow.app.util.DateUtils
+import com.taskflow.app.util.LocaleUtils
 import java.util.concurrent.TimeUnit
 
+/** Schedules a local reminder for tasks that have "Remind me" switched on. */
 object ReminderScheduler {
     private fun name(id: String) = "reminder-$id"
 
@@ -37,6 +37,7 @@ object ReminderScheduler {
             .setInputData(workDataOf("taskId" to task.localId))
             .build()
         wm.enqueueUniqueWork(name(task.localId), ExistingWorkPolicy.REPLACE, request)
+        AppLog.d("Reminder", "Reminder scheduled in ${delay / 60000} minute(s)")
     }
 
     fun cancel(context: Context, taskId: String) {
@@ -47,32 +48,19 @@ object ReminderScheduler {
 /** Posts a local notification when a task with "Remind me" reaches its due time. */
 class ReminderWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
-    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result {
         val app = applicationContext as TaskFlowApp
         val id = inputData.getString("taskId") ?: return Result.success()
         val task = app.db.taskDao().get(id) ?: return Result.success()
         if (task.deleted || task.isComplete || !app.session.notifications) return Result.success()
 
+        val localized = LocaleUtils.localized(applicationContext, app.session.language)
         val intent = Intent(applicationContext, TaskDetailActivity::class.java)
             .putExtra(TaskDetailActivity.EXTRA_TASK_ID, id)
-        val pending = PendingIntent.getActivity(
-            applicationContext, id.hashCode(), intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        NotificationHelper.show(
+            applicationContext, NotificationHelper.CHANNEL_REMINDERS, id.hashCode(),
+            localized.getString(R.string.reminder_title), task.title, intent
         )
-        val notification = NotificationCompat.Builder(applicationContext, TaskFlowApp.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(applicationContext.getString(R.string.reminder_title))
-            .setContentText(task.title)
-            .setContentIntent(pending)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
-        try {
-            NotificationManagerCompat.from(applicationContext).notify(id.hashCode(), notification)
-        } catch (e: SecurityException) {
-            // Notification permission not granted; nothing to do.
-        }
         return Result.success()
     }
 }
