@@ -2,221 +2,255 @@
 
 **Open-Source Coding (OPSC6312) — Portfolio of Evidence: Parts 2 and 3**
 
-TaskFlow is an offline-capable personal task management application developed for Android using **Kotlin**. It integrates with a **Node.js/Express REST API** and **MongoDB Atlas** to allow users to create, organise and manage tasks, track their progress and synchronise their work.
+**GitHub Repository:** https://github.com/st10439344/TaskFlow
 
-The application was initially developed as a prototype for Part 2 and extended during Part 3 with additional task management features, Firebase Cloud Messaging integration, improved localisation, testing and release preparation.
+## 1. Project Overview
 
-**GitHub repository:** https://github.com/st10439344/TaskFlow
+TaskFlow is an offline-capable Android task management application developed using Kotlin, XML layouts, Room, Retrofit and WorkManager. It communicates with a Node.js/Express REST API and uses MongoDB Atlas for cloud data storage.
 
-## 1. Project Objectives
+The application helps users organise daily responsibilities, manage tasks and subtasks, track productivity and continue working when the backend is temporarily unavailable.
 
-TaskFlow was developed to help users manage their daily responsibilities through a simple and accessible mobile interface.
+TaskFlow was initially developed as a functional prototype for Part 2 of the Portfolio of Evidence. During Part 3, it was expanded with recurring tasks, search and filtering, Firebase Cloud Messaging, improved localisation, additional testing and preparation for release.
 
-The main objectives are to:
+## 2. Project Objectives
 
-- Allow users to register and log in securely.
-- Create, update, organise, complete and delete tasks.
-- Support task lists, subtasks, priorities and reminders.
-- Allow users to work when the backend is unavailable.
-- Synchronise pending changes with the cloud database.
+The objectives of TaskFlow are to:
+
+- Provide user registration and secure authentication.
+- Allow users to create, edit, complete and delete tasks.
+- Organise tasks into lists and subtasks.
+- Support priorities, due dates and reminders.
+- Store tasks locally for offline use.
+- Synchronise pending changes with MongoDB Atlas.
 - Support English, isiZulu and Afrikaans.
-- Provide productivity tracking through streaks and weekly statistics.
-- Incorporate additional functionality for the final PoE.
+- Provide productivity tracking through streaks and statistics.
+- Implement push notifications using Firebase Cloud Messaging.
 
-## 2. Repository Layout
+## 3. Repository Structure
 
 ```text
 TaskFlow/
-├── app/                     Android application
-│   └── src/main/
-│       ├── java/            Kotlin source code
-│       └── res/             XML layouts and resources
-├── backend/                 Node.js/Express REST API
-│   ├── src/                 Routes, models and services
-│   └── tests/               Backend unit and API tests
-├── docs/                    Project documentation
-│   ├── screenshots/         Application and testing evidence
-│   ├── play-store/          Store listing graphics
+├── app/
+│   └── src/
+│       ├── main/
+│       │   ├── java/             Kotlin source code
+│       │   └── res/              Layouts and translations
+│       └── test/                 Android unit tests
+├── backend/
+│   ├── src/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── middleware/
+│   └── tests/                    Backend tests
+├── docs/
+│   ├── screenshots/              Testing evidence
+│   ├── play-store/               Store graphics
 │   ├── AI_USE_WRITEUP.md
 │   ├── DEMO_SCRIPT.md
 │   ├── PRIVACY_POLICY.md
 │   └── PUBLISHING.md
-├── .github/workflows/       GitHub Actions
+├── .github/workflows/           CI/CD workflows
 ├── RELEASE_NOTES.md
 └── README.md
 ```
 
-## 3. Features Implemented in Part 2
+## 4. Features Implemented in Part 2
 
-Part 2 focused on developing the core TaskFlow prototype, implementing the Android interface and connecting the application to a functional backend.
+Part 2 focused on developing the main application, implementing its backend and establishing the offline-first architecture.
 
 | Rubric item | Implementation |
 |---|---|
-| Authentication | User registration and email/password login, bcrypt password hashing, JWT authentication and locally stored sessions |
-| Settings | User name, language preferences, notifications, dark theme, password management and logout |
+| Authentication | Email registration and login, bcrypt password hashing and JWT authentication |
+| Settings | Name, language, notifications, dark theme, password management and logout |
 | REST API | Node.js/Express endpoints for authentication, users, lists, tasks and synchronisation |
-| Database | MongoDB Atlas for cloud storage and Room for local Android storage |
+| Database | MongoDB Atlas for cloud storage and Room for local storage |
 | API integration | Retrofit, OkHttp, JWT interceptor and centralised error handling |
 | Task management | Create, view, edit, complete and delete tasks, lists and subtasks |
-| Offline capability | Changes are written to Room and marked as pending until synchronisation is possible |
-| Productivity features | Streak tracking, weekly statistics and local task reminders |
-| Localisation | English, isiZulu and Afrikaans |
+| Offline operation | Changes saved locally in Room and marked as pending |
+| Synchronisation | WorkManager submits pending changes when backend connectivity is restored |
+| Productivity | Streak tracking, weekly statistics and local task reminders |
+| Languages | English, isiZulu and Afrikaans |
 
-The Part 2 design provided the foundation for the additional features and testing completed during Part 3.
+These features provided the foundation for the final PoE.
 
-## 4. Features Added or Extended in Part 3
+## 5. Features Added and Extended in Part 3
 
-### 4.1 Advanced Task Management
+### 5.1 Recurring Tasks
 
-Part 3 expanded TaskFlow's task management capabilities.
+TaskFlow supports repeating tasks for activities that occur regularly.
 
-The application supports:
+The recurrence logic calculates future due dates from the original schedule, accounting for months with different numbers of days.
 
-- Recurring tasks.
-- Task searching.
-- Filtering and sorting tasks.
-- Task priorities and due dates.
-- List and subtask management.
-- Improved task display and user interaction.
+### 5.2 Search, Filtering and Sorting
 
-Recurring-task logic was implemented to calculate future dates while accounting for differences in the number of days in each month.
+Part 3 introduced improved task navigation through:
 
-### 4.2 Firebase Cloud Messaging
+- Searching tasks.
+- Filtering tasks by status and list.
+- Sorting tasks.
+- Viewing today's, overdue, upcoming and completed tasks.
+- Managing priorities and due dates.
 
-Firebase Cloud Messaging (FCM) was integrated to support push notifications.
+These features make it easier for users to organise and locate their tasks.
+
+### 5.3 Offline Synchronisation
+
+TaskFlow uses Room as its local database and WorkManager for background synchronisation.
+
+When the backend is unavailable, users can continue creating tasks. Pending changes are stored locally until synchronisation is possible.
+
+During Part 3 testing, the Node.js backend was temporarily stopped while BlueStacks remained connected to the internet. Two tasks were created and marked **Waiting to sync**.
+
+After the backend restarted, WorkManager processed the pending changes, and the tasks were verified in MongoDB Atlas.
+
+**Result: Passed — pending tasks were successfully synchronised after backend restoration.**
+
+### 5.4 Firebase Cloud Messaging
+
+Firebase Cloud Messaging (FCM) was integrated into TaskFlow to provide push notification functionality.
 
 The implementation includes:
 
 - Firebase configuration in the Android application.
-- Firebase Admin SDK integration in the backend.
+- Firebase Admin SDK integration in the Node.js backend.
 - Android device-token registration.
-- A test notification feature in Settings.
-- Notification handling for selected task-related events.
+- A **Send test notification** option in Settings.
+- Notification handling in the Android application.
+- Backend support for sending task-related notification messages.
 
-**Testing outcome:** Firebase Admin initialised successfully and the Android application registered device tokens. However, some test messages were rejected with `messaging/registration-token-not-registered`. Actual notification delivery to the Android notification panel was not consistently confirmed.
+#### Firebase Notification Testing
 
-### 4.3 Improved Offline Synchronisation
+During testing, Firebase Admin initialised successfully and Android device tokens were registered with the backend.
 
-TaskFlow uses **Room** and **WorkManager** to support offline-first task management.
+Initial testing encountered Firebase token errors, including:
 
-When the backend is unavailable, users can continue creating tasks. These changes are saved locally and marked as pending.
+```text
+messaging/registration-token-not-registered
+```
 
-Once the backend becomes available again, the application attempts to synchronise the pending changes with MongoDB Atlas.
+The configuration and device-registration process were investigated and corrected during development.
 
-**Part 3 verification:** The backend was stopped while BlueStacks remained connected to the internet. Two tasks were created and displayed as waiting to synchronise. After restarting the backend, the pending changes were processed, and both tasks were confirmed in MongoDB Atlas.
+A subsequent test was reported successful, with the TaskFlow notification received on an Android device.
 
-This verified synchronisation following a backend outage. A complete airplane-mode test was not performed during this test.
+**Final reported result: Passed — Firebase push notification functionality was successfully demonstrated.**
 
-### 4.4 Multilingual Support
+Earlier token-registration errors are retained in the testing history to document the troubleshooting process.
 
-TaskFlow supports three languages:
+### 5.5 Google Sign-In
 
-- English
-- isiZulu
-- Afrikaans
+Google Sign-In configuration was extended during Part 3.
 
-Part 3 included further localisation improvements and translated interface messages.
+The following steps were completed:
 
-### 4.5 Additional Application Improvements
+- Google authentication enabled in Firebase.
+- Android debug SHA-1 fingerprint registered.
+- Google Web OAuth Client ID obtained.
+- Android and backend configuration updated.
 
-Other Part 3 improvements included:
+However, a successful Google Sign-In session was not achieved during final testing.
 
-- Notification settings and test functionality.
-- Updated Android compatibility handling.
-- Improved error messages.
-- UI adjustments for newer Android versions.
-- Additional Kotlin unit tests.
-- Backend notification tests.
-- GitHub Actions workflow updates.
-- Release notes and Play Store preparation resources.
+Email-and-password registration remained functional and was verified on the physical Xiaomi device.
 
-## 5. System Architecture
+### 5.6 Languages and User Interface
+
+TaskFlow supports:
+
+- English.
+- isiZulu.
+- Afrikaans.
+- Dark theme.
+- Notification preferences.
+- Profile settings.
+
+Part 3 included additional interface improvements, translations and Android compatibility changes.
+
+## 6. System Architecture
 
 TaskFlow follows a repository-based architecture.
 
 ```text
                    ANDROID APPLICATION
-                 Kotlin + XML + ViewBinding
+                     Kotlin + XML UI
                             |
                             v
                        Repositories
                             |
-              +-------------+-------------+
-              |                           |
-              v                           v
-        Room Database              Retrofit / OkHttp
-       Local task storage                 |
-              |                           v
-              |                    Node.js / Express
-              |                        REST API
-              |                           |
-              v                           v
-         WorkManager                 MongoDB Atlas
-       Background sync               Cloud database
+                  +---------+---------+
+                  |                   |
+                  v                   v
+            Room Database      Retrofit / OkHttp
+              Local data              |
+                  |                   v
+                  |             Node.js / Express
+                  |                 REST API
+                  |                   |
+                  v                   v
+             WorkManager          MongoDB Atlas
+           Background sync        Cloud database
 
-            Firebase Cloud Messaging
-                      |
-                      v
-             Firebase Admin SDK
-                Node.js backend
+                 Firebase Cloud Messaging
+                            |
+                            v
+                    Firebase Admin SDK
 ```
 
-### Architectural Components
+### Main Components
 
-**Android application:** Responsible for user interaction, task management and local storage.
+**Android application:** Provides the interface for authentication, task management, settings and notifications.
 
-**Room database:** Stores local task data and supports offline access.
+**Room database:** Stores task data locally and supports offline operation.
 
-**Repositories:** Coordinate data access and synchronisation between the Android application, local database and backend.
+**Repositories:** Coordinate operations between the local database and backend API.
 
-**WorkManager:** Processes background synchronisation and scheduled work.
+**WorkManager:** Handles background synchronisation and scheduled operations.
 
-**REST API:** Handles authentication, user information, tasks, lists, synchronisation and device registration.
+**Node.js/Express backend:** Provides authentication, task management, synchronisation and device registration endpoints.
 
-**MongoDB Atlas:** Stores users, lists and tasks.
+**MongoDB Atlas:** Stores user accounts, task lists and tasks.
 
-**Firebase Cloud Messaging:** Provides infrastructure for server-initiated push notifications.
+**Firebase Cloud Messaging:** Enables push messages to be sent from the backend to Android devices.
 
-### Data Synchronisation
+### Synchronisation Strategy
 
-Local tasks use client-generated identifiers to support retries without creating duplicate records. The synchronisation process reconciles local and remote changes using the application's conflict-resolution rules.
+Tasks use client-generated identifiers to support retries and reduce duplicate records.
 
-## 6. Technologies Used
+The application tracks pending local changes and synchronises them with the backend when connectivity is available.
+
+## 7. Technologies Used
 
 | Technology | Purpose |
 |---|---|
 | Kotlin | Android application development |
-| XML and ViewBinding | Android user interface |
+| XML and ViewBinding | User interface |
 | Room | Local database |
-| WorkManager | Background operations and synchronisation |
-| Retrofit and OkHttp | HTTP communication |
+| WorkManager | Background synchronisation |
+| Retrofit and OkHttp | API communication |
 | Node.js | Backend runtime |
-| Express.js | REST API |
-| MongoDB Atlas | Cloud database |
+| Express.js | REST API framework |
+| MongoDB Atlas | Cloud data storage |
 | JWT | Authenticated sessions |
 | bcrypt | Password hashing |
-| Firebase Cloud Messaging | Push notification integration |
-| Firebase Admin SDK | Backend notification requests |
-| JUnit | Android unit testing |
+| Firebase Cloud Messaging | Push notifications |
+| Firebase Admin SDK | Server-side notification requests |
+| JUnit | Android unit tests |
 | Jest and Supertest | Backend testing |
 | Git and GitHub | Version control |
-| GitHub Actions | Automated build and test workflows |
+| GitHub Actions | Automated builds and tests |
 | Android Studio | Development and debugging |
 
-## 7. Installation and Setup
+## 8. Installation and Setup
 
-### 7.1 Requirements
+### 8.1 Requirements
 
-- Android Studio with a compatible Android SDK.
+- Android Studio and a compatible Android SDK.
 - Java version compatible with the project's Gradle configuration.
 - Node.js and npm.
 - MongoDB Atlas database.
-- Firebase project for push notification configuration.
-- Android device or emulator.
+- Firebase project.
+- Android device or compatible emulator.
 
-The original Part 3 configuration targets modern Android versions. A separate Android 7.1-compatible test configuration was also used for BlueStacks.
-
-### 7.2 Clone the Repository
+### 8.2 Clone the Repository
 
 ```bash
 git clone https://github.com/st10439344/TaskFlow.git
@@ -225,7 +259,7 @@ cd TaskFlow
 
 Open the project in Android Studio and allow Gradle to synchronise.
 
-### 7.3 Backend Setup
+### 8.3 Backend Setup
 
 Navigate to the backend directory:
 
@@ -234,7 +268,9 @@ cd backend
 npm install
 ```
 
-Copy `.env.example` to `.env` and configure the required environment variables.
+Create a `.env` file using `.env.example` as a template.
+
+Required configuration includes:
 
 ```env
 PORT=3000
@@ -242,7 +278,7 @@ MONGODB_URI=YOUR_MONGODB_CONNECTION_STRING
 JWT_SECRET=YOUR_SECURE_JWT_SECRET
 JWT_EXPIRES_IN=7d
 GOOGLE_WEB_CLIENT_ID=YOUR_GOOGLE_WEB_CLIENT_ID
-FIREBASE_SERVICE_ACCOUNT=YOUR_BASE64_ENCODED_SERVICE_ACCOUNT
+FIREBASE_SERVICE_ACCOUNT=YOUR_BASE64_FIREBASE_SERVICE_ACCOUNT
 ```
 
 Start the server:
@@ -251,13 +287,13 @@ Start the server:
 npm start
 ```
 
-The API exposes a health-check endpoint:
+Verify the backend using:
 
 ```text
 GET /health
 ```
 
-A healthy backend returns a response containing:
+A successful response contains:
 
 ```json
 {
@@ -265,86 +301,146 @@ A healthy backend returns a response containing:
 }
 ```
 
-**Security:** The real `.env` file, database passwords, JWT secrets and Firebase Admin private credentials must never be committed to GitHub.
+**Security:** Database credentials, JWT secrets, Firebase private keys and real environment files must never be uploaded to GitHub.
 
-### 7.4 Android Configuration
+### 8.4 Android Setup
 
-Open `app/build.gradle.kts` and configure the relevant build settings:
+1. Open the project in Android Studio.
+2. Configure `API_BASE_URL` in `app/build.gradle.kts`.
+3. Configure the Google Web OAuth Client ID.
+4. Register the package `com.taskflow.app` in Firebase.
+5. Add the correct `google-services.json` inside `app/`.
+6. Synchronise Gradle.
+7. Build and run the application.
 
-- `API_BASE_URL`: backend HTTPS address, including the trailing `/`.
-- `GOOGLE_WEB_CLIENT_ID`: Google OAuth Web application client ID.
+The main Part 3 project targets modern Android versions. A separate Android 7.1 compatibility configuration was used for testing in BlueStacks.
 
-Register the Android application in Firebase using:
+## 9. Testing and Quality Assurance
 
-```text
-com.taskflow.app
-```
+Testing was performed using Android Studio, BlueStacks 5, backend logs, MongoDB Atlas and a physical Xiaomi smartphone running HyperOS.
 
-Download the matching `google-services.json` and place it in the `app/` directory.
+### 9.1 Testing Summary
 
-For Google authentication, configure the relevant Android signing certificate fingerprint in Firebase and Google Cloud.
+| Test case | Result |
+|---|---|
+| Android debug build | Passed |
+| Launch on BlueStacks | Passed |
+| Installation on physical Xiaomi | Passed |
+| Email registration on Xiaomi | Passed |
+| Backend health endpoint | Passed |
+| MongoDB Atlas connection | Passed |
+| Task creation and editing | Passed in development testing |
+| Searching, filtering and sorting | Tested successfully |
+| Pending offline changes | Passed |
+| Synchronisation after backend restoration | Passed |
+| Three-language interface | Implemented and exercised |
+| Firebase Admin initialisation | Passed |
+| Firebase device registration | Passed |
+| Firebase notification test request | Passed |
+| Firebase push notification received | Passed — reported successful |
+| Google Sign-In | Unresolved |
+| Google Play public publication | Not completed |
 
-The project can then be built and launched using Android Studio.
+### 9.2 Physical Device Testing
 
-## 8. Testing and Quality Assurance
+TaskFlow was installed on a physical Xiaomi smartphone running HyperOS.
 
-Testing was performed during development using Android Studio, BlueStacks, backend logs, MongoDB Atlas and a physical Android phone.
+The application launched successfully, and account registration worked using the backend.
 
-### 8.1 Part 2 Testing
+Because Android Studio and the Node.js backend were running inside a CloudLabs virtual machine, a temporary Cloudflare Tunnel provided HTTPS access to the backend from the phone.
 
-Part 2 included testing of:
+This demonstrated the Android application communicating with the backend from real mobile hardware.
 
-- User registration and login.
-- Task creation and editing.
-- Lists and subtasks.
-- Data validation.
-- API integration.
-- Local database operations.
-- Basic offline functionality.
-- Streak and reminder calculations.
+### 9.3 Offline Synchronisation Testing
 
-### 8.2 Part 3 Testing Results
+The test procedure was:
 
-| Test case | Result | Evidence |
-|---|---|---|
-| Android APK build | Passed | Android Studio build output |
-| Launch in BlueStacks | Passed | Emulator demonstration |
-| Installation on physical Xiaomi | Passed | Physical-device installation |
-| Email account registration on Xiaomi | Passed | Registration and dashboard |
-| Backend connection | Passed | API health response |
-| MongoDB Atlas connection | Passed | Backend terminal |
-| Task creation and editing | Passed in development testing | Application demonstration |
-| Search, filtering and sorting | Tested in development | Application demonstration |
-| Offline task queue | Passed | Pending task indicators |
-| Synchronisation after backend restart | Passed | Sync logs and MongoDB Atlas |
-| Language selection | Implemented and exercised | Application settings |
-| Firebase Admin initialisation | Passed | Backend logs |
-| FCM device-token registration | Passed | Backend logs |
-| End-to-end FCM push delivery | Not confirmed | Firebase token rejection |
-| Google Sign-In | Unresolved | Google authentication troubleshooting |
-| Google Play publication | Not completed | Release preparation only |
+1. Open TaskFlow in BlueStacks.
+2. Stop the Node.js backend.
+3. Create two tasks while the backend is unavailable.
+4. Observe the **Waiting to sync** indicator.
+5. Restart the backend.
+6. Allow WorkManager to process pending changes.
+7. Verify the synchronised tasks in MongoDB Atlas.
 
-### 8.3 Physical Device Testing
+**Result: Passed.**
 
-TaskFlow was installed successfully on a **Xiaomi smartphone running HyperOS**.
+This demonstrated recovery from backend unavailability rather than a full airplane-mode test.
 
-The physical phone was used to verify that the application could launch and successfully register a user account.
+### 9.4 Firebase Notification Testing
 
-Because Android Studio and the Node.js backend were running in a CloudLabs virtual machine, a temporary **Cloudflare Tunnel** was used to provide an HTTPS connection between the physical device and the backend.
+The Firebase notification testing process included:
 
-This enabled physical-device API testing without requiring a permanent hosted backend.
+1. Configuring Firebase in the Android application.
+2. Adding Firebase Admin credentials to the backend.
+3. Registering Android device tokens.
+4. Sending notifications through the backend.
+5. Investigating initial Firebase token-registration failures.
+6. Retesting the notification feature.
 
-### 8.4 Testing Limitations
+Following troubleshooting, the notification feature was reported working.
 
-Although Firebase configuration and backend device registration were completed, reliable FCM message delivery was not demonstrated during testing.
+**Result: Passed — successful notification reception was reported during final testing.**
 
-Google Sign-In was also configured using Firebase Authentication, an Android debug SHA-1 fingerprint and a Google Web OAuth client ID, but a successful sign-in was not achieved.
+## 10. Part 3 Screenshot Evidence
 
-These issues are recorded as outstanding limitations rather than completed test cases.
+The following screenshots were captured during development and testing.
 
-## 9. Automated Tests and CI/CD
+### Figure 1: Firebase Test Notification
 
-The repository contains automated tests for Android and backend logic.
+![TaskFlow Firebase notification test](docs/screenshots/TaskFlow_Firebase_Test_Notification.png)
+
+**Description:** This screenshot shows the TaskFlow Settings screen in BlueStacks after the **Send test notification** option was selected.
+
+The application displayed:
+
+*“Test notification sent. It should arrive in a few seconds.”*
+
+This screenshot provides visual evidence of the test request and application response.
+
+Successful notification reception was reported separately during subsequent testing. This particular screenshot shows the confirmation message, not the Android notification panel.
+
+### Figure 2: MongoDB Atlas Database
+
+![TaskFlow MongoDB Atlas database](docs/screenshots/taskflow%20database.png)
+
+**Description:** This screenshot shows the TaskFlow database in MongoDB Atlas.
+
+The database contains:
+
+- `tasklists`
+- `tasks`
+- `users`
+
+These collections store information used by the TaskFlow backend.
+
+Task records synchronised from Android were also verified in MongoDB Atlas during testing.
+
+### Figure 3: Offline Task Synchronisation
+
+![TaskFlow offline synchronisation](docs/screenshots/waitingforsync%281%29.png)
+
+**Description:** This screenshot shows the TaskFlow dashboard in BlueStacks during synchronisation testing.
+
+A task named **OFFLINE SYNC TEST** is marked:
+
+**Waiting to sync**
+
+The application also displays a **Syncing changes...** banner.
+
+This demonstrates how TaskFlow identifies local task changes awaiting synchronisation.
+
+After the backend was restarted, the pending tasks were successfully synchronised.
+
+### Additional Evidence
+
+A video recording of the Firebase test notification request was captured during development.
+
+The TaskFlow application was also installed and tested on a physical Xiaomi device, including successful email-based account registration.
+
+## 11. Automated Tests and CI/CD
+
+TaskFlow includes Android and backend tests.
 
 ### Android Tests
 
@@ -352,7 +448,7 @@ The repository contains automated tests for Android and backend logic.
 ./gradlew :app:testDebugUnitTest
 ```
 
-Examples include:
+Test areas include:
 
 - Input validation.
 - Date calculations.
@@ -360,7 +456,7 @@ Examples include:
 - Synchronisation reconciliation.
 - Recurring-task calculations.
 - Task filtering.
-- Notification-related message logic.
+- Notification message logic.
 
 ### Backend Tests
 
@@ -371,34 +467,17 @@ npm test
 
 Backend tests cover selected API operations and business logic.
 
-GitHub Actions workflows are included under `.github/workflows/` to support automated build and test execution.
+GitHub Actions workflows are located under:
 
-The presence of these workflows does not imply that every workflow passed for the final commit; results should be checked in the repository's Actions tab.
+```text
+.github/workflows/
+```
 
-## 10. Screenshots and Demonstration
+These workflows support automated building and testing. Their execution results can be checked in GitHub's Actions tab.
 
-The following screenshots and recordings provide evidence of development and testing:
+## 12. Google Play Store Preparation
 
-- Login screen.
-- Registration screen.
-- Main task dashboard.
-- Task creation and editing.
-- Search, filtering and sorting.
-- Settings and language selection.
-- Tasks waiting to synchronise.
-- Synchronised records in MongoDB Atlas.
-- Firebase notification test request.
-- TaskFlow installed and running on the Xiaomi phone.
-
-Screenshots can be found in `docs/screenshots/` once uploaded.
-
-The project demonstration guide is provided in:
-
-`docs/DEMO_SCRIPT.md`
-
-## 11. Google Play Store Preparation
-
-Part 3 included preparation for distributing TaskFlow through Google Play.
+Part 3 included preparation for Google Play distribution.
 
 The repository contains:
 
@@ -407,58 +486,98 @@ The repository contains:
 - Release notes.
 - Privacy policy draft.
 - Publishing instructions.
-- Release build workflow.
+- Release workflow configuration.
 
-See:
+Additional information is available in:
 
 `docs/PUBLISHING.md`
 
-**Publication status:** TaskFlow was not publicly published on Google Play during this assessment. Public publication requires a Google Play developer account, a signed Android App Bundle, compliance information, applicable testing and review requirements, and a stable production backend.
+**Publication status:** TaskFlow was not publicly published on Google Play during this assessment.
 
-## 12. Known Limitations and Future Improvements
+Public publication still requires a developer account, release signing, a signed Android App Bundle, store compliance checks, applicable testing requirements and stable backend hosting.
 
-The following improvements are planned:
+The temporary Cloudflare Tunnel was used only for development and testing.
 
-1. **Google Sign-In:** Complete the OAuth flow and verify successful authentication on a physical Android device.
-2. **FCM notifications:** Resolve Firebase's `registration-token-not-registered` response and confirm actual notification delivery.
-3. **Permanent backend hosting:** Replace the temporary development tunnel with a stable production HTTPS backend.
-4. **Expanded testing:** Conduct additional physical-device testing and full network-offline tests.
-5. **Google Play release:** Complete release signing, Play Console setup, testing requirements and publication.
-6. **Password recovery:** Complete and verify a forgot-password flow if required by the final assessment.
+## 13. Known Limitations
 
-## 13. Security and Privacy
+### 13.1 Google Sign-In
+
+Google authentication was configured in Firebase and the Android application, but a successful Google Sign-In session was not verified.
+
+Email-and-password authentication remained functional.
+
+### 13.2 Production Backend Hosting
+
+The backend ran inside CloudLabs, and physical-device testing used a temporary HTTPS Cloudflare Tunnel.
+
+A stable production backend is required for long-term public deployment.
+
+### 13.3 Google Play Publication
+
+The application has not yet been publicly released on Google Play.
+
+### 13.4 Additional Testing
+
+Further testing is recommended for:
+
+- Google Sign-In.
+- Full airplane-mode functionality.
+- Long-term notification reliability across multiple devices.
+- Release-build testing.
+- Production deployment.
+
+## 14. Security and Privacy
 
 TaskFlow uses authenticated API requests and password hashing.
 
-The repository includes an example backend environment file but excludes operational credentials.
+The repository includes example environment configuration but excludes operational credentials.
 
-Sensitive information such as MongoDB passwords, JWT secrets, Firebase service-account private keys and production keystores should not be uploaded to GitHub.
+The following information must remain private:
 
-A privacy policy draft is available in:
+- MongoDB passwords.
+- JWT secrets.
+- Firebase service-account private keys.
+- Production signing keys.
+- User passwords.
+
+The privacy policy draft is located at:
 
 `docs/PRIVACY_POLICY.md`
 
-## 14. Use of Artificial Intelligence
+## 15. Use of Artificial Intelligence
 
-AI tools were used as supporting resources during the project for selected implementation tasks, debugging, technical explanations and documentation.
+AI tools were used as supporting resources during selected stages of development.
 
-The group's design decisions, configuration work, practical testing, evaluation and final submission remained human responsibilities.
+Claude and ChatGPT assisted with technical explanations, selected implementation tasks, troubleshooting and documentation.
 
-A detailed reflection and Harvard-style references are provided in:
+The group remained responsible for evaluating solutions, reviewing code, configuring services, conducting practical tests and preparing the final submission.
+
+The full AI-use reflection and Harvard-style references are provided in:
 
 `docs/AI_USE_WRITEUP.md`
 
-## 15. Conclusion
+## 16. Future Improvements
 
-TaskFlow demonstrates the development of a native Android task management application integrated with a REST API and cloud database.
+Planned improvements include:
 
-Part 2 established the application's core functionality, including authentication, task management, local storage and synchronisation.
+1. Completing and verifying Google Sign-In.
+2. Moving the backend to permanent HTTPS hosting.
+3. Expanding notification reliability testing across more devices.
+4. Conducting full airplane-mode tests.
+5. Completing release signing and Google Play publication.
+6. Expanding automated test coverage.
 
-Part 3 expanded the application with recurring tasks, search and filtering, improved localisation, Firebase integration, testing and release preparation.
+## 17. Conclusion
 
-Practical testing confirmed that TaskFlow could be installed and launched on a physical Xiaomi device, register users through the backend and synchronise locally created tasks after backend availability was restored.
+TaskFlow demonstrates the development of a native Android application with offline-first task management, REST API integration, MongoDB Atlas and Firebase Cloud Messaging.
 
-Outstanding Google Sign-In, push notification delivery and Google Play publication requirements have been documented for future improvement.
+Part 2 established the application's core authentication, task management and synchronisation functionality.
+
+Part 3 extended the application through recurring tasks, advanced searching and filtering, improved localisation, push notification integration, additional testing and release preparation.
+
+Practical testing demonstrated successful installation on a physical Xiaomi device, email-based registration, task synchronisation following backend restoration and reported successful Firebase notification delivery.
+
+Google Sign-In and public Google Play publication remain outstanding.
 
 ---
 
@@ -466,9 +585,3 @@ Outstanding Google Sign-In, push notification delivery and Google Play publicati
 **Assessment:** Portfolio of Evidence — Parts 2 and 3  
 **Repository:** https://github.com/st10439344/TaskFlow  
 **Submission date:** 5 November 2026
-cd backend && npm test                # API tests
-```
-GitHub Actions (`.github/workflows/ci.yml`) runs both on every push and uploads the debug APK.
-
-## Team
-Sindisiwe Ntuli (lead, Android integration) · Thandiswa Gama (backend/API) · Boelo Mashego (offline data and sync) · Mandisa Motha (UI/UX, localisation, QA)
